@@ -4,9 +4,9 @@ const {Router} = require('express');
 const Routers = Router();
 Routers.post('/register', async (req, res) => {
     try {
-        const { username, password } = req.body;
+        const { email, password } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = await User.create({ username, password: hashedPassword });
+        const newUser = await User.create({ email, password: hashedPassword });
         res.status(201).send({ message: 'User registered', userId: newUser._id });
     } catch (error) {
         res.status(500).send({ error: 'Error registering user' });
@@ -14,8 +14,8 @@ Routers.post('/register', async (req, res) => {
 });
 Routers.post('/login', async (req, res) => {
     try {
-        const { username, password } = req.body;
-        const user = await User.findOne({ username });
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
         if (user && await bcrypt.compare(password, user.password)) {
             res.send({ message: 'Login successful', userId: user._id });
         } else {

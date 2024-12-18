@@ -11,8 +11,8 @@
     <h2 class = 'container mt-3 mx-3'>Login or Register to Chat</h2>
     <div id="authSection" class = 'container mt-3 my-3'>
             <div class="mb-3">
-            <label  class="form-label">UserName</label>
-            <input type="text" class="form-control" id="username" placeholder="Username" >
+            <label  class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" placeholder="Email" >
             
             </div>
             <div class="mb-3">
@@ -39,7 +39,7 @@
     <script>
         let roomId = null;
         const socket = io();
-        const username = document.getElementById('username');
+        const email = document.getElementById('email');
         const password = document.getElementById('password');
         const authSection = document.getElementById('authSection');
         const chatSection = document.getElementById('chatSection');
@@ -53,28 +53,34 @@ const myalert = document.getElementsByClassName('alert');
           // Store the room ID
         // Registration
         document.getElementById('register').addEventListener('click', async () => {
-            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const response = await fetch('/m/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
+                body: JSON.stringify({ email, password })
             });
             const data = await response.json();
-            alert('User Registered');
+            if(data.message){
+                alert('User Registered');
             authSection.style.display = 'none';
             chatSection.style.display = 'block';
+            }
+            else{
+                alert(data.error);
+            }
+           
             
         });
 
         // Login
         document.getElementById('login').addEventListener('click', async () => {
-            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const response = await fetch('/m/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
+                body: JSON.stringify({ email, password })
 
             });
             const data = await response.json();
@@ -137,8 +143,10 @@ socket.emit('message', messageval);
     authSection.style.display = 'block'; // Show auth section again
     message.value = ''; // Clear message input
     chatBox.innerHTML = ''; // Clear chat message
-    username.textContent = '';
+    email.textContent = '';
     password.textContent = '';
+    message.disabled = true;
+    
     
 });
     </script>
