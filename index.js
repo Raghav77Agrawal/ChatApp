@@ -97,7 +97,7 @@ console.log(`${socket.id} and ${partnerSocket.id} are connected in ${roomid}`);
 })
    
 
-const PORT = process.env.port;
+const PORT = process.env.port || 5000;
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
