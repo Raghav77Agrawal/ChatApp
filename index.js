@@ -12,7 +12,7 @@ app.use(express.json());
 
 
 // Connect to MongoDB
-mongoose.connect(process.env.url)
+mongoose.connect(process.env.mongourl,{ useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.log('Database connection error:', err));
 
