@@ -12,7 +12,7 @@ app.use(express.json());
 
 
 // Connect to MongoDB
-mongoose.connect(process.env.mongourl,{ useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect("mongodb://127.0.0.1:27017/ourapp")
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.log('Database connection error:', err));
 
@@ -23,6 +23,7 @@ app.get('/', (req, res) => {
 });
 const ourmap = new Map();
 let queue = [];
+let activeusers = {};
 io.on('connection' , (socket)=>{
    
     socket.on('findPartner' , ()=>{

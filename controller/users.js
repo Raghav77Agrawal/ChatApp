@@ -5,6 +5,10 @@ const Routers = Router();
 Routers.post('/register', async (req, res) => {
     try {
         const { email, password } = req.body;
+        const x = await User.findOne({email:email});
+        if(x){
+          return  res.status(500).send({error:"Already exist"});
+        }
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = await User.create({ email, password: hashedPassword });
         res.status(201).send({ message: 'User registered', userId: newUser._id });
