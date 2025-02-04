@@ -5,12 +5,11 @@ const {Router} = require('express');
 const Routers = Router();
 const cors = require('cors');
 Routers.use(cors({
-    origin: 'http://localhost:3000', 
+    origin: "http://localhost:3000", 
     methods: ['GET', 'POST', 'PUT', 'DELETE'], 
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization'],              
   }));
-  const ac = new Map();
 Routers.post('/register', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -23,6 +22,7 @@ Routers.post('/register', async (req, res) => {
         
         res.status(201).send({ message: 'User registered', userId: newUser._id });
     } catch (error) {
+        console.log(error);
         res.status(500).send({ error: 'Error registering user' });
     }
 });
@@ -31,9 +31,7 @@ Routers.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
-        if(ac.has(email)){
-            return res.status(401).send({error:'Already active session'});
-        }
+       
         if (user && await bcrypt.compare(password, user.password)) {
             const token = jwt.sign({email:email},Secret);
             res.cookie("token", token, {
@@ -41,7 +39,7 @@ Routers.post('/login', async (req, res) => {
                 secure: false,   
                 sameSite: 'lax'  
             });
-            ac.set(email, token);
+            
             res.send({ message: 'Login successful', userId: user._id });
         } else {
             res.status(401).send({ error: 'Invalid credentials' });
@@ -82,8 +80,7 @@ Routers.get('/auth', async (req,res)=>{
 
 })
 Routers.post('/logout', async (req,res)=>{
-    const dec = jwt.verify( req.cookies?.token, Secret);
-    ac.delete(dec.email);
+  
     res.clearCookie("token", { 
         httpOnly: true, 
         secure: false, // Change to true in production (HTTPS)

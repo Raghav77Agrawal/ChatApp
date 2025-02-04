@@ -12,7 +12,7 @@ const cors = require('cors');
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-      origin: process.env.reacturl,
+      origin: "http://localhost:3000",
       methods: ['GET', 'POST'],
       credentials: true
     }
@@ -23,20 +23,22 @@ const io = new Server(server, {
 
 //mongodb connection
 
-mongoose.connect(process.env.url)
+mongoose.connect("mongodb://127.0.0.1:27017/myappp")
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.log('Database connection error:', err));
 
 // Middleware and Routes
-app.use('/m', UserRouter);
 app.use(express.json());
 app.use(cookieparser());
 app.use(cors({
-    origin: process.env.reacturl, 
+    origin: "http://localhost:3000", 
     methods: ['GET', 'POST', 'PUT', 'DELETE'], 
     credentials: true, //for cookies authentication
     allowedHeaders: ['Content-Type', 'Authorization'],             
   }));
+app.use('/m', UserRouter);
+
+
 const ourmap = new Map();
 let queue = [];
 //connection build sockets
