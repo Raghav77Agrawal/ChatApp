@@ -4,12 +4,14 @@ const jwt = require('jsonwebtoken');
 const {Router} = require('express');
 const Routers = Router();
 const cors = require('cors');
+const cookieparser = require('cookie-parser');
 Routers.use(cors({
     origin: "http://localhost:3000", 
     methods: ['GET', 'POST', 'PUT', 'DELETE'], 
     credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization'],              
+    allowedHeaders: ['Content-Type', 'Authorization'],
   }));
+  Routers.use(cookieparser());
 Routers.post('/register', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -39,8 +41,7 @@ Routers.post('/login', async (req, res) => {
                 secure: false,   
                 sameSite: 'lax'  
             });
-            
-            res.send({ message: 'Login successful', userId: user._id });
+            res.send({ message: 'Login successful', userId: user._id , token:token});
         } else {
             res.status(401).send({ error: 'Invalid credentials' });
         }
@@ -53,10 +54,9 @@ Routers.get('/auth', async (req,res)=>{
         return res.status(201).send();
     }
     const t = req.cookies?.token;
-   
-    console.log("token", t);
+
     if(!t){
-        return res.status(500);
+        return res.status(500).send({error:"error"});
     }
     
     const x = jwt.verify(t,Secret,(err,user)=>{

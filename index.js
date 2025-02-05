@@ -30,6 +30,7 @@ mongoose.connect("mongodb://127.0.0.1:27017/myappp")
 // Middleware and Routes
 app.use(express.json());
 app.use(cookieparser());
+app.use(express.urlencoded({extended:false}))
 app.use(cors({
     origin: "http://localhost:3000", 
     methods: ['GET', 'POST', 'PUT', 'DELETE'], 

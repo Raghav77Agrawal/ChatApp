@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Chat App</title>
+</head>
+
+    </head>
+<body>
+    <h2 class = 'container mt-3 mx-3'>Login or Register to Chat</h2>
+    <div id="authSection" class = 'container mt-3 my-3'>
+            <div class="mb-3">
+            <label  class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" placeholder="Email" >
+            
+            </div>
+            <div class="mb-3">
+                <label  class="form-label">Password</label>
+                <input type="text" class="form-control" id="password" placeholder="Password">
+                
+                </div>
+            
+            <button  id = 'register' class="btn btn-primary">Register</button>
+            <button  id = 'login' class="btn btn-success">Login</button>
+    </div>
+    
+    <div id="chatSection" class = 'container mt-3 mx-3' style="display:none;">
+        <button  type="submit" id="findPartner" class="btn btn-primary mb-3">Find a Random Partner</button>
+
+    <button type="submit" id="leaveApp" class="btn btn-danger mb-3">Leave Application</button>
+        <div id="chatBox"></div>
+        <input type="text" id="message" placeholder="Type a message..." disabled>
+        <button id="send" class = 'btn btn-primary' disabled>Send</button>
+    </div>
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        let roomId = null;
+        const socket = io();
+        const email = document.getElementById('email');
+        const password = document.getElementById('password');
+        const authSection = document.getElementById('authSection');
+        const chatSection = document.getElementById('chatSection');
+        const findPartnerBtn = document.getElementById('findPartner');
+        const chatBox = document.getElementById('chatBox');
+        const message = document.getElementById('message');
+        const sendBtn = document.getElementById('send');
+    
+const leaveAppBtn = document.getElementById('leaveApp');
+const myalert = document.getElementsByClassName('alert');
+          // Store the room ID
+        // Registration
+        document.getElementById('register').addEventListener('click', async () => {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const response = await fetch('/m/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await response.json();
+            if(data.message){
+                alert('User Registered');
+            authSection.style.display = 'none';
+            chatSection.style.display = 'block';
+            }
+            else{
+                alert(data.error);
+            }
+           
+            
+        });
+
+        // Login
+        document.getElementById('login').addEventListener('click', async () => {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const response = await fetch('/m/login', {
+                method: 'POST',
+                credentials:"include",
+                body: JSON.stringify({ email, password })
+
+            });
+            const data = await response.json();
+            if (data.message) {
+                authSection.style.display = 'none';
+                chatSection.style.display = 'block';
+                alert('User Logged In');
+            } else {
+                alert(data.error);
+            }
+        });
+
+// Find partner
+findPartnerBtn.addEventListener('click', async ()=>{
+findPartnerBtn.disabled = true;
+ socket.emit('leave');
+socket.emit('findPartner');
+message.value = '';
+chatBox.textContent = '';
+sendBtn.disabled = true;
+message.disabled = true;
+
+})
+socket.on('partnerfound', (roomid)=>{
+sendBtn.disabled = false;
+message.disabled = false;
+findPartnerBtn.disabled = false;
+roomId = roomid;
+alert('Bravo! Partner Found , now you can chat!!')
+                })
+socket.on('Finding', ()=>{
+                    alert('Finding the user, You will be notified as soon as user is connected');
+                })
+                socket.on('Already exist', ()=>{
+                    alert('You already requested for new user');
+                })
+sendBtn.addEventListener('click', async () =>{
+const messageval = message.value;
+chatBox.innerHTML += ` <p>You: ${messageval}</p>`;
+message.value = '';
+socket.emit('message', messageval);
+})
+
+       socket.on('mymessage', (data)=>{
+        console.log(data);
+        if(data.sender!==socket.id){
+            chatBox.innerHTML +=`<p> Partner: ${data.msg}</p> `;
+        }
+       })
+       socket.on('partnerleft', (message)=>{
+        chatBox.innerHTML = '';
+        message.value = '';
+        message.disabled = true;
+        sendBtn.disabled = true;
+        alert('OOPS! Partner Left');
+       })
+       leaveAppBtn.addEventListener('click', () => {
+    socket.emit('leave'); // Emit the leave event to the server
+    chatSection.style.display = 'none'; // Hide chat section
+    authSection.style.display = 'block'; // Show auth section again
+    message.value = ''; // Clear message input
+    chatBox.innerHTML = ''; // Clear chat message
+    email.value = '';
+    password.value = '';
+    message.disabled = true;
+    
+    
+});
+    </script>
+</body>
+</html>
