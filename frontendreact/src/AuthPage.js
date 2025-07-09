@@ -1,80 +1,131 @@
-import {  useState } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Toast from './Toast.js'
+function AuthPage({setUser}) {
+  const [toastMsg,setToastMsg] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    gender: "prefer-not-to-say",
+    age: "",
+    interests: "",
+  });
+  const navigate = useNavigate();
 
-import {useNavigate} from "react-router-dom";
-function AuthPage(){
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const navigate = useNavigate();
-    async function handlelogin(){
-        try {
-            const response = await fetch("http://localhost:5000/m/login", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              credentials:"include",
-              body: JSON.stringify({ email, password }),
-            });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
       
-            const data = await response.json();
-            if (response.ok) {
-              console.log("Login successful:", data);
-              alert("Login Successful!");
-              window.location.reload();
-              navigate('/chat');
-            } else {
-              console.error("Login failed:", data);
-              alert(data.message || "Login failed");
-            }
-          } catch (error) {
-            console.error("Error during login:", error);
-          }
+    // Convert interests from comma-separated string to array
+    const payload = {
+      ...formData,
+      interests: formData.interests===""?"NA":formData.interests,
+      age: Number(formData.age),
+    };
+
+    try {
+      const response = await fetch("http://localhost:5000/m/create-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+       
+       
+setUser(data.user);
+        navigate("/chat"); // redirect if you want
+      } else {
+        setToastMsg("Age is required");
+      }
+    } catch (err) {
+      setToastMsg("An error occurred");
     }
-    async function handleregister(){
-        
-        try {
-            const response = await fetch("http://localhost:5000/m/register", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              credentials:"include",
-              body: JSON.stringify({ email, password }),
-            });
-      
-            const data = await response.json();
-            if (response.ok) {
-              console.log("Registration successful:", data);
-              alert("Registration Successful!");
-            } else {
-              console.error("Registration failed:", data);
-              alert(data.message || "Registration failed");
-            }
-          } catch (error) {
-            console.error("Error during registration:", error);
-          }
-    }
-    return(
-        <div>
-            <h2 className = 'container my-3'>Welcome To ChatApp</h2>
-    <div id="authSection" className = 'container mt-3 my-3'>
-            <div className="mb-3">
-            <label  className="form-label">Email</label>
-            <input type="email" className="form-control" id="email" placeholder="Email" value = {email} onChange={(e)=>{setEmail(e.target.value)}} />
-            
-            </div>
-            <div className="mb-3">
-                <label  className="form-label">Password</label>
-                <input type="text" className="form-control" id="password" placeholder="Password" value={password} onChange = {(e)=>{setPassword(e.target.value)}}/>
-                
-                </div>
-            <div className="container my-3">
-            <button  id = 'register' className="btn btn-primary" onClick={handleregister}>Register</button>
-            <button  id = 'login' className="btn btn-success mx-3" onClick={handlelogin}>Login</button>
-            </div>
-            
+  };
+
+  return (
+    <div
+      className="vh-100 d-flex justify-content-center align-items-center"
+      style={ {backgroundImage: `url("/Assets/back.png")`,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat" }}
+    >
+      <div className="bg-white rounded shadow p-4" style={{ width: "400px" }}>
+        <h2 className="text-center mb-4">Welcome To ChatApp</h2>
+
+        <form onSubmit={handleSubmit}>
+          <div className="mb-2">
+            <label>Name</label>
+            <input
+              type="text"
+              name="name"
+              placeholder="Your name"
+              className="form-control"
+              value={formData.name}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="mb-2">
+            <label>Gender</label>
+            <select
+              name="gender"
+              className="form-control"
+              value={formData.gender}
+              onChange={handleChange}
+            >
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="non-binary">Non-binary</option>
+              <option value="prefer-not-to-say">Prefer not to say</option>
+            </select>
+          </div>
+
+          <div className="mb-2">
+            <label>Age</label>
+            <input
+              type="number"
+              name="age"
+              min="13"
+              max="120"
+              className="form-control"
+              value={formData.age}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="mb-3">
+            <label>Interests (comma-separated)</label>
+            <input
+              type="text"
+              name="interests"
+              placeholder="e.g. coding, dancing"
+              className="form-control"
+              value={formData.interests}
+              onChange={handleChange}
+            />
+          </div>
+
+          <button type="submit" className="btn btn-success w-100">
+            Start Chat
+          </button>
+        </form>
+        {toastMsg && <Toast message={toastMsg} onClose={() => setToastMsg("")} />}
+      </div>
     </div>
-        </div>
-    )
+  );
 }
+
 export default AuthPage;

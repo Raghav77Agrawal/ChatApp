@@ -1,93 +1,152 @@
 import io from 'socket.io-client';
-import {useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Toast from './Toast';
+
+import { Header } from './Header';
+import Chatbox from './Chatbox';
+import Footer from './Footer';
+
 const SOCKET_URL = 'http://localhost:5000';
-function ChatPage(){
-    const [socket,setSocket] = useState(null);
-    const [chatbox,setChatbox] = useState([]);
-    const [message,setMessages] = useState("");
-    const [isDisabled, setdisable] = useState(false);
-    const [sendisable, setdis] = useState(true);
-    const navigate = useNavigate();
-    
-    useEffect((socket) => {
-        // Establish socket connection when component mounts
-         // Redirect if not authenticated
-      
-        const socketInstance = io(SOCKET_URL);
-        setSocket(socketInstance);
-    
-        // Listen for incoming messages
-        socketInstance.on('partnerfound', (roomid)=>{
-          setdis(false);
-          setdisable(false);
-          
-          alert('Bravo! Partner Found , now you can chat!!')
-        })
-        socketInstance.on('mymessage', (data)=>{
-          console.log(data);
-          if(data.sender!==socket.id){
-              setChatbox((prev) => [...prev, `<strong>Partner:</strong> ${data.msg}`]);
-          }
-         })
-         socketInstance.on('partnerleft', (message)=>{
-          setChatbox([]);
-          setMessages("");
-          setdis(true);
-          alert('OOPS! Partner Left');
-         })
-         socketInstance.on('logout',()=>{
-          socket.emit('leave');
-          setChatbox([]);
-          setMessages("");
-          setdis(true);
-          navigate('/');
-         })
-    
-        // Clean up the socket connection when component unmounts
-        return () => {
-          socketInstance.disconnect();
-        };
-      }, [navigate]);
-    function checkrandom(){
-setdisable(true);
-socket.emit('leave');
-socket.emit('findPartner');
-setMessages("");
-setChatbox([]);
-    }
-   async function logout(){
-      socket.emit('leave');
-      await fetch("http://localhost:5000/m/logout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials:"include"
-      });
+
+function ChatPage({user}) {
+  const [socket, setSocket] = useState(null);
+  const [chatbox, setChatbox] = useState([]);
+ const [toastMsg, setToastMsg] = useState("");
+
+const [myuser,setmyuser] = useState(user);
+  const [message, setMessages] = useState("");
+  const [isPartnerTyping, setIsPartnerTyping] = useState(false);
+  const [isDisabled, setDisable] = useState(false);
+  const [sendDisable, setSendDisable] = useState(true); // use one state for controlling send button
+  const navigate = useNavigate();
+
+
+
+  useEffect(() => {
+    const socketInstance = io(SOCKET_URL);
+    setSocket(socketInstance);
+socketInstance.on('connect', () => {
+   socketInstance.emit('init', user._id);
+});
+    socketInstance.on('partnerfound', (roomid) => {
+      setSendDisable(false);
+      setDisable(false);
+      socketInstance.emit('partnerinfo',user);
+      setToastMsg('Bravo! Partner Found, now you can chat!!');
+    });
+    socketInstance.on('Finding', (data)=>{
+      setDisable(true);
+      setmyuser(user);
+      setToastMsg('Finding the user! You will be notified as soon as user joins');
+    })
+
+    socketInstance.on('mymessage', (data) => {
+      if (data.sender !== socketInstance.id) {
+        setChatbox((prev) => [...prev, { sender: 'them', text: data.msg }]);
+
+      }
+    });
+
+    socketInstance.on('partnerleft', () => {
       setChatbox([]);
       setMessages("");
-      setdis(true);
-      setdisable(false);
-      window.location.reload();
-    }
-    function send(){
-      if (message.trim() !== "") {
-        const msgval = message;
-        setChatbox((prev) => [...prev, `<strong>You:</strong> ${message}`]);
-        setMessages(""); // Clear input after sending
-        socket.emit('message', msgval);
-      }
-    }
-    return<>
-    <div id="chatSection" className = 'container mt-3 mx-3'>
-        <button  type="submit" id="findPartner" className="btn btn-primary mb-3" disabled = {isDisabled} onClick={checkrandom}>Find a Random Partner</button>
+      setSendDisable(true);
+      setmyuser(user);
+      setToastMsg('OOPS! Partner Left');
+    });
 
-    <button type="submit" id="leaveApp" className="btn btn-danger mb-3" onClick={logout}>Leave Application</button>
-        <div id="chatBox" value = {chatbox}></div>
-        <input type="text" id="message" placeholder="Type a message..." value = {message} disabled = {sendisable}/>
-        <button id="send" className = 'btn btn-primary' onClick={send} disabled = {sendisable} >Send</button>
-    </div>
-    </>
+    socketInstance.on('logout', () => {
+      socketInstance.emit('leave');
+      setChatbox([]);
+      setMessages("");
+      
+      setSendDisable(true);
+      navigate('/');
+    });
+ socketInstance.on('partnerTyping', () => {
+    setIsPartnerTyping(true);
+  });
+
+  socketInstance.on('partnerStopTyping', () => {
+    setIsPartnerTyping(false);
+  });
+  socketInstance.on('voice', (audioData) => {
+  const audioBlob = new Blob([audioData], { type: 'audio/webm' });
+  const audioUrl = URL.createObjectURL(audioBlob);
+
+  setChatbox((prev) => [
+    ...prev,
+    { sender: 'them', audio: audioUrl }
+  ]);
+});
+socketInstance.on('file', ({ name, type, buffer }) => {
+  const blob = new Blob([new Uint8Array(buffer)], { type });
+  const url = URL.createObjectURL(blob);
+
+  setChatbox(prev => [...prev, { sender: 'them', file: { url, name, type } }]);
+});
+socketInstance.on('partnerinfo',(usr)=>{
+setmyuser(usr);
+})
+
+
+    // Clean up the socket connection when the component unmounts
+    return () => {
+      socketInstance.disconnect();
+    };
+  }, [navigate,user]);
+
+  
+
+
+  return (
+    
+  <div
+  className="vh-100 d-flex justify-content-center align-items-center"
+  style={{backgroundImage: `url("/Assets/back.png")`,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat" }}
+>
+
+
+  <div
+    id="chatSection"
+    className="bg-white rounded shadow d-flex flex-column"
+    style={{ width: '400px', height: '90vh' }}
+  >
+    <Header
+    isDisabled = {isDisabled}
+    isPartnerTyping = {isPartnerTyping}
+    sendDisable = {sendDisable}
+    setSendDisable = {setSendDisable}
+    setChatbox = {setChatbox}
+    setMessages = {setMessages}
+    setDisable = {setDisable}
+    socket = {socket}
+    toastMsg = {toastMsg}
+    setToastMsg = {setToastMsg}
+    user = {myuser}
+    apnadata = {user}
+    ></Header>
+
+   <Chatbox chatbox = {chatbox}></Chatbox>
+ <Footer
+message = {message}
+sendDisable = {sendDisable}
+socket = {socket}
+setChatbox = {setChatbox}
+setMessages = {setMessages}
+> </Footer>
+{toastMsg && <Toast message={toastMsg} onClose={() => setToastMsg("")} />}
+
+  </div>
+</div>
+
+
+    
+  );
 }
-export  default ChatPage;
+
+export default ChatPage;

@@ -11,3 +11,7 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+#chatBox .position-relative:hover .btn-light {
+  display: inline-block !important;
+}
+
