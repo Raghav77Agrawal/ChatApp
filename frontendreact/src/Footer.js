@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import EmojiPicker from 'emoji-picker-react';
-import './index.css';
+
 export default function Footer(props) {
   const typingTimeoutRef = useRef();
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -161,29 +161,24 @@ export default function Footer(props) {
         </button>
 
         {/* Emoji picker */}
-       {showEmojiPicker && (
-  <div
-    ref={emojiPickerRef}
-    style={{
-      position: 'absolute',
-      bottom: '50px',
-      right: '0',
-      zIndex: 1000,
-      width: 'min(300px, 90vw)', // max 300px, but shrink on small screens
-      maxHeight: '50vh',         // never taller than half screen
-      overflowY: 'auto',         // scroll if needed
-      background: 'white',
-      borderRadius: '8px',
-      boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
-    }}
-  >
-    <EmojiPicker
-      onEmojiClick={(emojiData) => {
-        props.setMessages((prev) => prev + emojiData.emoji);
-      }}
-    />
-  </div>
-)}
+        {showEmojiPicker && (
+          <div
+            ref={emojiPickerRef}
+            style={{
+              position: 'absolute',
+              bottom: '40px',
+            left: '50%',
+transform: 'translateX(-50%)',
+              zIndex: 1000,
+            }}
+          >
+            <EmojiPicker
+              onEmojiClick={(emojiData) => {
+                props.setMessages((prev) => prev + emojiData.emoji);
+              }}
+            />
+          </div>
+        )}
       </div>
 
 
