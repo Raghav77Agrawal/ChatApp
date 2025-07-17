@@ -11,7 +11,7 @@ const cookieparser = require('cookie-parser');
 const cors = require('cors');
 const server = http.createServer(app);
 const allowedOrigins = [
-    process.env.FRONTEND_URL,
+    "https://frontendchat-lemon.vercel.app",
     'http://localhost:3000'
 ];
 const io = new Server(server, {
