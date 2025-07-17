@@ -6,7 +6,7 @@ import { Header } from './Header';
 import Chatbox from './Chatbox';
 import Footer from './Footer';
 
-const SOCKET_URL = 'http://localhost:5000';
+const SOCKET_URL = process.env.socketurl;
 
 function ChatPage({ user }) {
   const [socket, setSocket] = useState(null);
