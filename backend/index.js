@@ -12,7 +12,7 @@ const cors = require('cors');
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "https://frontendchat-lemon.vercel.app",
+        origin: process.env.FRONTEND_URL,
         methods: ['GET', 'POST'],
         credentials: true
     }
@@ -34,11 +34,10 @@ mongoose.connect(process.env.MONGODB_URI)
 // Middleware and Routes
 app.use(express.json());
 app.use(cookieparser());
-app.set('trust proxy', 1);
 
 app.use(express.urlencoded({ extended: false }))
 app.use(cors({
-    origin: "https://frontendchat-lemon.vercel.app",
+    origin: process.env.FRONTEND_URL,
     methods: ['GET', 'POST'],
     credentials: true, //for cookies authentication
     allowedHeaders: ['Content-Type', 'Authorization'],
