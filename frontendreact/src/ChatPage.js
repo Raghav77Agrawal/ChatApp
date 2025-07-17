@@ -121,7 +121,7 @@ function ChatPage({ user }) {
       <div
         id="chatSection"
         className="bg-white rounded shadow d-flex flex-column"
-        style={{ width: '400px', height: '80vh' }}
+        
       >
         <Header
           isDisabled={isDisabled}

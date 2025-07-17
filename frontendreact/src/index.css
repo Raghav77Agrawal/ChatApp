@@ -14,4 +14,13 @@ code {
 #chatBox .position-relative:hover .btn-light {
   display: inline-block !important;
 }
+#chatSection{
+width:400px;
+height:90vh;
+}
+@media (max-width:600px) {
+  #chatSection{
+  height:80vh;
+  }
+}
 
