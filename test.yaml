@@ -1,0 +1,17 @@
+config:
+  target: "http://localhost:5000"
+  phases:
+    - duration: 40           # 40 seconds
+      arrivalRate: 50        # 50 users/sec × 40 sec = 2000 users
+  engines:
+    socketio: {}
+scenarios:
+  - engine: socketio
+    flow:
+      - emit:
+          channel: init
+          data: "test-user-{{ $randomNumber(1, 100000) }}"
+      - think: 1
+      - emit:
+          channel: findPartner
+      - think: 10

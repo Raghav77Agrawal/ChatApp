@@ -10,7 +10,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        
+        {/* if user has not provided info then he/she will be navigated to '/' else '/chat' */}
         <Route
           path="/"
           element={!user ? <AuthPage setUser={setUser} /> : <Navigate to="/chat" />}

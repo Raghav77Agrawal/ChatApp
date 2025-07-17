@@ -4,9 +4,7 @@ export function Header(props) {
     const [showAttachmentOptions, setShowAttachmentOptions] = useState(false);
     const [showPartnerInfo, setShowPartnerInfo] = useState(false);
     const fileInputRef = useRef();
-    
-
-const attachmentRef = useRef();
+    const attachmentRef = useRef();
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (
@@ -32,7 +30,7 @@ const attachmentRef = useRef();
         if (!file) return;
 
 
-        // 🔔 Check file size here
+        //  Checks file size
         if (file.size > 1 * 1024 * 1024) { // example: > 1 MB
             props.setToastMsg("File too large. Please upload files smaller than 1MB.");
             return;
@@ -71,7 +69,7 @@ const attachmentRef = useRef();
 
     const logout = async () => {
         props.socket.emit('leave');
-        props.socket.emit('logout',props.apnadata);
+        props.socket.emit('logout', props.apnadata);
         props.setChatbox([]);
         props.setMessages("");
         props.setSendDisable(true);
@@ -80,12 +78,12 @@ const attachmentRef = useRef();
     };
 
     return (
- <>
+        <>
             <div className="p-2 border-bottom">
                 <div className="d-flex flex-wrap align-items-center justify-content-between">
                     <div>
                         <div style={{ fontWeight: "bold", fontSize: "1rem" }}>
-                            {props.apnadata._id===props.user._id?"You":props.user.name}
+                            {props.apnadata._id === props.user._id ? "You" : props.user.name}
                         </div>
                         <div style={{ fontSize: "0.85rem", color: "#666" }}>
                             {props.isPartnerTyping ? "Typing…" : "Online"}
@@ -101,7 +99,7 @@ const attachmentRef = useRef();
                                 style={{ position: "relative", display: "inline-block" }}
 
                             >
-                                {/* ℹ️ INFO BUTTON */}
+
                                 <button
                                     className="btn btn-light btn-sm mx-1"
                                     disabled={props.isDisabled}
@@ -122,7 +120,7 @@ const attachmentRef = useRef();
                                         }}
                                     >
                                         <div className="card-header text-center p-2">
-                                            <strong>{props.user._id===props.apnadata._id?"Your Details":"Partner Details"}</strong>
+                                            <strong>{props.user._id === props.apnadata._id ? "Your Details" : "Partner Details"}</strong>
                                         </div>
                                         <div className="card-body p-2">
                                             <p className="mb-1"><strong>Name:</strong> {props.user.name}</p>
@@ -161,7 +159,7 @@ const attachmentRef = useRef();
                             <i className="fa-solid fa-door-open"></i>
                         </button>
 
-                        {/* 📎 Attachment popup — moved inside the 📎 wrapper */}
+
                         {showAttachmentOptions && (
                             <div
                                 ref={attachmentRef}
@@ -206,7 +204,7 @@ const attachmentRef = useRef();
 
                     </div>
 
-{props.toastMsg && <Toast message={props.toastMsg} onClose={() => props.setToastMsg("")} />}
+                    {props.toastMsg && <Toast message={props.toastMsg} onClose={() => props.setToastMsg("")} />}
                 </div>
             </div>
             <input

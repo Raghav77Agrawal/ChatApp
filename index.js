@@ -1,12 +1,11 @@
 require('dotenv').config()
-
 const express = require('express');
 const http = require('http');
-
 const { Server } = require('socket.io');
 const mongoose = require('mongoose');
 const Userji = require('./model/users');
 const UserRouter = require('./controller/users');
+const ratelimit = require('express-rate-limit');
 const app = express();
 const cookieparser = require('cookie-parser');
 const cors = require('cors');
@@ -17,6 +16,10 @@ const io = new Server(server, {
         methods: ['GET', 'POST'],
         credentials: true
     }
+});
+const limiter = ratelimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 30, // limit each IP to 30 requests per minute
 });
 
 
@@ -39,7 +42,7 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-app.use('/m', UserRouter);
+app.use('/m',limiter, UserRouter);
 
 //ourmap used for mapping socket.id with roomid
 const ourmap = new Map();
@@ -53,8 +56,8 @@ io.on('connection', (socket) => {
     //search for partner in queue
 
     socket.on('init', (userId) => {
-    socketUserMap.set(socket.id, userId);
-  });
+        socketUserMap.set(socket.id, userId);
+    });
     socket.on('findPartner', () => {
 
 
@@ -93,22 +96,22 @@ io.on('connection', (socket) => {
         socket.to(ourmap.get(socket.id)).emit('mymessage', { msg: message, sender: socket.id });
     })
     socket.on('typing', () => {
-  socket.to(ourmap.get(socket.id)).emit('partnerTyping');
-});
+        socket.to(ourmap.get(socket.id)).emit('partnerTyping');
+    });
 
-socket.on('stopTyping', () => {
-  socket.to(ourmap.get(socket.id)).emit('partnerStopTyping');
-});
-socket.on('voice', (audioBlob) => {
-  socket.to(ourmap.get(socket.id)).emit('voice', audioBlob);
-});
-socket.on('file', ({ name, type, buffer }) => {
-  const realBuffer = Buffer.from(buffer);
-  socket.to(ourmap.get(socket.id)).emit('file', { name, type, buffer: realBuffer });
-});
-socket.on('partnerinfo',(user)=>{
-    socket.to(ourmap.get(socket.id)).emit('partnerinfo',user);
-})
+    socket.on('stopTyping', () => {
+        socket.to(ourmap.get(socket.id)).emit('partnerStopTyping');
+    });
+    socket.on('voice', (audioBlob) => {
+        socket.to(ourmap.get(socket.id)).emit('voice', audioBlob);
+    });
+    socket.on('file', ({ name, type, buffer }) => {
+        const realBuffer = Buffer.from(buffer);
+        socket.to(ourmap.get(socket.id)).emit('file', { name, type, buffer: realBuffer });
+    });
+    socket.on('partnerinfo', (user) => {
+        socket.to(ourmap.get(socket.id)).emit('partnerinfo', user);
+    })
 
     socket.on('leave', () => {
         const roomId = ourmap.get(socket.id); // Get the room ID
@@ -116,9 +119,10 @@ socket.on('partnerinfo',(user)=>{
             // Notify partner about leaving
             const partnerId = roomId.split('#').find(id => id !== socket.id);
             const partnerSocket = io.sockets.sockets.get(partnerId);
-            partnerSocket.leave(roomId);
-            ourmap.delete(partnerSocket.id);
+     
             if (partnerSocket) {
+                       partnerSocket.leave(roomId);
+            ourmap.delete(partnerSocket.id);
                 partnerSocket.emit('partnerleft', { message: 'Your partner has left the chat.' });
             }
             // Leave the room
@@ -127,32 +131,33 @@ socket.on('partnerinfo',(user)=>{
 
         }
     });
-    socket.on('logout',async (user)=>{
- try {
-        await Userji.findByIdAndDelete(user._id);
-    } catch (err) {
-        console.error(`Failed to delete user ${user._id}:`, err);
-    }
+    socket.on('logout', async (user) => {
+        try {
+            await Userji.findByIdAndDelete(user._id);
+        } catch (err) {
+            console.error(`Failed to delete user ${user._id}:`, err);
+        }
     })
     socket.on('disconnect', async () => {
         const roomId = ourmap.get(socket.id); // Get the room ID
         const userId = socketUserMap.get(socket.id);
-    if (userId) {
-        try {
-            await Userji.findByIdAndDelete(userId);
-        } catch (err) {
-            console.error(`Failed to delete user ${userId}:`, err);
+        if (userId) {
+            try {
+                await Userji.findByIdAndDelete(userId);
+            } catch (err) {
+                console.error(`Failed to delete user ${userId}:`, err);
+            }
+            socketUserMap.delete(socket.id);
         }
-        socketUserMap.delete(socket.id);
-    }
-        
+
         if (roomId) {
             // Notify partner about leaving
             const partnerId = roomId.split('#').find(id => id !== socket.id);
             const partnerSocket = io.sockets.sockets.get(partnerId);
-            partnerSocket.leave(roomId);
-            ourmap.delete(partnerSocket.id);
+         
             if (partnerSocket) {
+                   partnerSocket.leave(roomId);
+            ourmap.delete(partnerSocket.id);
                 partnerSocket.emit('partnerleft', { message: 'Your partner has left the chat.' });
             }
             // Leave the room
@@ -166,6 +171,6 @@ socket.on('partnerinfo',(user)=>{
 
 
 const PORT = process.env.port || 5000;
-server.listen(PORT,'0.0.0.0', () => {
+server.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
 });

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Toast from './Toast.js'
-function AuthPage({setUser}) {
-  const [toastMsg,setToastMsg] = useState("");
+function AuthPage({ setUser }) {
+  const [toastMsg, setToastMsg] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     gender: "prefer-not-to-say",
@@ -22,11 +22,9 @@ function AuthPage({setUser}) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-      
-    // Convert interests from comma-separated string to array
     const payload = {
       ...formData,
-      interests: formData.interests===""?"NA":formData.interests,
+      interests: formData.interests === "" ? "NA" : formData.interests,
       age: Number(formData.age),
     };
 
@@ -42,10 +40,10 @@ function AuthPage({setUser}) {
 
       const data = await response.json();
       if (response.ok) {
-       
-       
-setUser(data.user);
-        navigate("/chat"); // redirect if you want
+
+
+        setUser(data.user);
+        navigate("/chat");
       } else {
         setToastMsg("Age is required");
       }
@@ -57,10 +55,12 @@ setUser(data.user);
   return (
     <div
       className="vh-100 d-flex justify-content-center align-items-center"
-      style={ {backgroundImage: `url("/Assets/back.png")`,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    backgroundRepeat: "no-repeat" }}
+      style={{
+        backgroundImage: `url("/Assets/back.png")`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat"
+      }}
     >
       <div className="bg-white rounded shadow p-4" style={{ width: "400px" }}>
         <h2 className="text-center mb-4">Welcome To ChatApp</h2>
