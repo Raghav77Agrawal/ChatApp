@@ -34,6 +34,8 @@ mongoose.connect(process.env.MONGODB_URI)
 // Middleware and Routes
 app.use(express.json());
 app.use(cookieparser());
+app.set('trust proxy', 1);
+
 app.use(express.urlencoded({ extended: false }))
 app.use(cors({
     origin: "https://frontendchat-lemon.vercel.app",
