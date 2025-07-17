@@ -137,11 +137,11 @@ export function Header(props) {
 
                         )}
                         <button
-                            className="btn btn-light btn-sm mx-1"
+                            className="btn btn-primary btn-sm mx-1"
                             disabled={props.isDisabled}
                             onClick={checkRandom}
                         >
-                            <i className="fa-solid fa-magnifying-glass"></i>
+                           Find Partner
                         </button>
 
                         <button
