@@ -10,19 +10,9 @@ const app = express();
 const cookieparser = require('cookie-parser');
 const cors = require('cors');
 const server = http.createServer(app);
-const allowedOrigins = [
-    "https://frontendchat-lemon.vercel.app",
-    'http://localhost:3000'
-];
 const io = new Server(server, {
     cors: {
-        origin: function(origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
+        origin: "https://frontendchat-lemon.vercel.app",
         methods: ['GET', 'POST'],
         credentials: true
     }
@@ -46,13 +36,7 @@ app.use(express.json());
 app.use(cookieparser());
 app.use(express.urlencoded({ extended: false }))
 app.use(cors({
-    origin: function(origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
+    origin: "https://frontendchat-lemon.vercel.app",
     methods: ['GET', 'POST'],
     credentials: true, //for cookies authentication
     allowedHeaders: ['Content-Type', 'Authorization'],
