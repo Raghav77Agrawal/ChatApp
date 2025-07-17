@@ -12,7 +12,7 @@ const cors = require('cors');
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: process.env.frontendurl,
+        origin: "https://frontendchat-lemon.vercel.app/",
         methods: ['GET', 'POST'],
         credentials: true
     }
@@ -36,7 +36,7 @@ app.use(express.json());
 app.use(cookieparser());
 app.use(express.urlencoded({ extended: false }))
 app.use(cors({
-    origin: process.env.frontendurl,
+    origin: "https://frontendchat-lemon.vercel.app/",
     methods: ['GET', 'POST'],
     credentials: true, //for cookies authentication
     allowedHeaders: ['Content-Type', 'Authorization'],
