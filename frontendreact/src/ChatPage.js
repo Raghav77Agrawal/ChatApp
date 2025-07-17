@@ -6,7 +6,7 @@ import { Header } from './Header';
 import Chatbox from './Chatbox';
 import Footer from './Footer';
 
-const SOCKET_URL = process.env.socketurl;
+const SOCKET_URL = process.env.REACT_APP_SOCKET_URL;
 
 function ChatPage({ user }) {
   const [socket, setSocket] = useState(null);

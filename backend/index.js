@@ -12,7 +12,7 @@ const cors = require('cors');
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:3000",
+        origin: process.env.frontendurl,
         methods: ['GET', 'POST'],
         credentials: true
     }
@@ -36,7 +36,7 @@ app.use(express.json());
 app.use(cookieparser());
 app.use(express.urlencoded({ extended: false }))
 app.use(cors({
-    origin: "http://localhost:3000",
+    origin: process.env.frontendurl,
     methods: ['GET', 'POST'],
     credentials: true, //for cookies authentication
     allowedHeaders: ['Content-Type', 'Authorization'],

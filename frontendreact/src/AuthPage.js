@@ -29,7 +29,7 @@ function AuthPage({ setUser }) {
     };
 
     try {
-      const response = await fetch(`${process.env.socketurl}m/create-user`, {
+      const response = await fetch(`${process.env.REACT_APP_SOCKET_URL}m/create-user`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
