@@ -11,21 +11,76 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
-#chatBox .position-relative:hover .btn-light {
-  display: inline-block !important;
+
+#chatSection {
+  width: 100%;
+  max-width: 400px;
+  min-width: 320px;
+  height: 90vh;
+  margin: 0 auto;
 }
-#chatSection{
-width:400px;
-height:90vh;
+
+.header-container {
+  background-color: #f8f9fa;
 }
-@media (max-width:600px) {
-  #chatSection{
-  height:80vh;
+
+.cardl {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  width: 180px;
+  max-width: 90vw;
+  word-wrap: break-word;
+  z-index: 1000;
+}
+
+.namel{
+  width:auto;
+}
+
+.attachment-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  min-width: 150px;
+  max-width: 90vw;
+  z-index: 1000;
+}
+
+@media (max-width: 600px) {
+  #chatSection {
+    height: 80vh;
   }
+
+  .cardl,
+.attachment-menu {
+  position: absolute;
+  top: 100%;
+  margin-top: 4px;
+  z-index: 1000;
+  width: min(90vw, 180px);
+  word-wrap: break-word;
+  right: 0;
 }
 
+@media (max-width: 400px) {
+  .cardl,
+.attachment-menu {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 4px;
+  z-index: 1000;
+  width: min(90vw, 180px);
+  word-wrap: break-word;
 
+}
+.namel{
+  width:1vw;
+}
+}
 
-
-
-
+}

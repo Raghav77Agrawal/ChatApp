@@ -81,7 +81,7 @@ export function Header(props) {
         <>
             <div className="p-2 border-bottom">
                 <div className="d-flex flex-wrap align-items-center justify-content-between">
-                    <div>
+                    <div className="namel">
                         <div style={{ fontWeight: "bold", fontSize: "1rem" }}>
                             {props.apnadata._id === props.user._id ? "You" : props.user.name}
                         </div>
@@ -109,39 +109,38 @@ export function Header(props) {
 
 
                                 {showPartnerInfo && (
-                                    <div
-                                        className="card shadow"
-                                        style={{
-                                            position: 'absolute',
-                                            top: '50px',
-                                            right: '10px',
-                                            zIndex: 1000,
-                                            width: '220px'
-                                        }}
-                                    >
+                                    <div className="card shadow cardl">
                                         <div className="card-header text-center p-2">
-                                            <strong>{props.user._id === props.apnadata._id ? "Your Details" : "Partner Details"}</strong>
+                                            <strong>
+                                                {props.user._id === props.apnadata._id
+                                                    ? "Your Details"
+                                                    : "Partner Details"}
+                                            </strong>
                                         </div>
                                         <div className="card-body p-2">
-                                            <p className="mb-1"><strong>Name:</strong> {props.user.name}</p>
-                                            <p className="mb-1"><strong>Age:</strong> {props.user.age}</p>
-                                            <p className="mb-1"><strong>Gender:</strong> {props.user.gender}</p>
-                                            <p className="mb-0"><strong>Interests:</strong> {props.user.interests}</p>
+                                            <p className="mb-1">
+                                                <strong>Name:</strong> {props.user.name}
+                                            </p>
+                                            <p className="mb-1">
+                                                <strong>Age:</strong> {props.user.age}
+                                            </p>
+                                            <p className="mb-1">
+                                                <strong>Gender:</strong> {props.user.gender}
+                                            </p>
+                                            <p className="mb-0">
+                                                <strong>Interests:</strong> {props.user.interests}
+                                            </p>
                                         </div>
-
                                     </div>
                                 )}
                             </div>
-
-
-
                         )}
                         <button
                             className="btn btn-primary btn-sm mx-1"
                             disabled={props.isDisabled}
                             onClick={checkRandom}
                         >
-                           Find Partner
+                            Find Partner
                         </button>
 
                         <button

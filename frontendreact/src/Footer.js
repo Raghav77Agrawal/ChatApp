@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import EmojiPicker from 'emoji-picker-react';
+// import EmojiPicker from 'emoji-picker-react';
 
 export default function Footer(props) {
   const typingTimeoutRef = useRef();
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  // const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const emojiPickerRef = useRef();
   const emojiButtonRef = useRef();
   const [isRecording, setIsRecording] = useState(false);
@@ -20,7 +20,7 @@ export default function Footer(props) {
         emojiButtonRef.current &&
         !emojiButtonRef.current.contains(event.target)
       ) {
-        setShowEmojiPicker(false);
+        // setShowEmojiPicker(false);
       }
     };
 
@@ -141,7 +141,7 @@ export default function Footer(props) {
         />
 
         {/* Emoji button inside input */}
-        <button
+        {/* <button
           ref={emojiButtonRef}
           onClick={() => setShowEmojiPicker(!showEmojiPicker)}
           disabled={props.sendDisable}
@@ -158,10 +158,10 @@ export default function Footer(props) {
           }}
         >
           <i class="fa-solid fa-face-smile" ></i>
-        </button>
+        </button> */}
 
         {/* Emoji picker */}
-        {showEmojiPicker && (
+        {/* {showEmojiPicker && (
           <div
             ref={emojiPickerRef}
             style={{
@@ -178,7 +178,7 @@ transform: 'translateX(-50%)',
               }}
             />
           </div>
-        )}
+        )} */}
       </div>
 
 
