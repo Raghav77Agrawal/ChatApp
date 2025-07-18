@@ -36,7 +36,7 @@ code {
 }
 
 .namel{
-  width:auto;
+  width :150px;
 }
 
 .attachment-menu {
@@ -64,7 +64,10 @@ code {
   word-wrap: break-word;
   right: 0;
 }
-
+.namel{
+  width:22vw;
+}
+}
 @media (max-width: 400px) {
   .cardl,
 .attachment-menu {
@@ -79,8 +82,9 @@ code {
 
 }
 .namel{
-  width:1vw;
+  width:22vw;
+  overflow: hidden;
 }
 }
 
-}
+
